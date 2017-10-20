@@ -69,7 +69,7 @@ class Entry extends Component {
               </td>
             </tr>
             <tr>
-              <td colspan="2">
+              <td colSpan="2">
                 <textarea
                   value={this.props.query_text}
                   onChange={this.handleQueryTextChange}
