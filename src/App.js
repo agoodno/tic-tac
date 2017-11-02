@@ -23,7 +23,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { servers: [], query_templates: [], environment: 'inhouse', server: '', query_text: '', results: { columns: [], rows: [] } };
+    this.state = { servers: [], query_templates: [], environment: 'inhouse', server: '', countyNo: null, query_text: '', results: { columns: [], rows: [] } };
     this.handleServersChange = this.handleServersChange.bind(this);
     this.handleQueryTemplateChange = this.handleQueryTemplateChange.bind(this);
     this.handleEnvChange = this.handleEnvChange.bind(this);
@@ -38,7 +38,6 @@ class App extends Component {
   }
 
   fetchChoicesForEnv() {
-    console.log("fetching choices with state:"); console.log(this.state);
     this.fetchData(`http://localhost:3001/servers?env=${this.state.environment}`, GET_OPTIONS, this.handleServersChange);
     this.fetchData(`http://localhost:3001/query_templates?env=${this.state.environment}`, GET_OPTIONS, this.handleQueryTemplateChange);
   }
@@ -66,8 +65,8 @@ class App extends Component {
     this.setState({ environment: environment }, this.fetchChoicesForEnv);
   }
 
-  handleServerChange(server) {
-    this.setState({ server: server });
+  handleServerChange(server, countyNo) {
+    this.setState({ server: server, countyNo: countyNo });
   }
 
   handleQueryTextChange(query_text) {
@@ -79,12 +78,12 @@ class App extends Component {
   }
 
   handleExecuteButtonClick(evt) {
-    console.log("Executing with: "); console.log(this.state);
+    // console.log("Executing with: "); console.log(this.state);
 
     var options = {
       body: JSON.stringify({
         connection_string: this.state.server,
-        query_text: this.state.query_text
+        query_text: this.queryText()
       }),
       ...POST_OPTIONS
     };
@@ -95,8 +94,12 @@ class App extends Component {
       this.handleResultsChange);
   }
 
+  queryText() {
+    return this.state.query_text.replace(/\$countyNo/, this.state.countyNo);
+  }
+
   render() {
-    console.log("App rendering with: "); console.log(this.state);
+    // console.log("App rendering with: "); console.log(this.state);
 
     return (
       <div className="App">

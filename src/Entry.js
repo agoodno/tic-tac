@@ -18,7 +18,8 @@ class Entry extends Component {
   }
 
   handleServerChange(evt) {
-    this.props.onServerChange(evt.target.value);
+    var countyNo = evt.target.options[evt.target.selectedIndex].dataset.countyNo;
+    this.props.onServerChange(evt.target.value, countyNo);
   }
 
   handleQueryTemplateChange(evt) {
@@ -36,7 +37,7 @@ class Entry extends Component {
   }
 
   render() {
-    console.log("Entry rendering with: "); console.log(this.state);
+    // console.log("Entry rendering with: "); console.log(this.state);
 
     var serverOptions = [<option value="">--Select--</option>];
     var envOptions = [];
@@ -45,7 +46,7 @@ class Entry extends Component {
     this.props.servers.forEach((server) => {
       if (!server.disabled) {
         var selected = (this.props.server === server.url);
-        serverOptions.push(<option value={server.url} selected={selected}>{server.name}</option>);
+        serverOptions.push(<option value={server.url} selected={selected} data-county-no={server.countyNo}>{server.name}</option>);
       }
     });
     this.environments.forEach((environment) => {
