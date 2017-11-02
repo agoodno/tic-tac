@@ -23,9 +23,10 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { servers: [], query_templates: [], server: '', query_text: '', results: { columns: [], rows: [] } };
+    this.state = { servers: [], query_templates: [], environment: 'inhouse', server: '', query_text: '', results: { columns: [], rows: [] } };
     this.handleServersChange = this.handleServersChange.bind(this);
     this.handleQueryTemplateChange = this.handleQueryTemplateChange.bind(this);
+    this.handleEnvChange = this.handleEnvChange.bind(this);
     this.handleServerChange = this.handleServerChange.bind(this);
     this.handleQueryTextChange = this.handleQueryTextChange.bind(this);
     this.handleResultsChange = this.handleResultsChange.bind(this);
@@ -33,8 +34,13 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.fetchData('http://localhost:3001/servers', GET_OPTIONS, this.handleServersChange);
-    this.fetchData('http://localhost:3001/query_templates', GET_OPTIONS, this.handleQueryTemplateChange);
+    this.fetchChoicesForEnv();
+  }
+
+  fetchChoicesForEnv() {
+    console.log("fetching choices with state:"); console.log(this.state);
+    this.fetchData(`http://localhost:3001/servers?env=${this.state.environment}`, GET_OPTIONS, this.handleServersChange);
+    this.fetchData(`http://localhost:3001/query_templates?env=${this.state.environment}`, GET_OPTIONS, this.handleQueryTemplateChange);
   }
 
   fetchData(url, options, handler) {
@@ -54,6 +60,10 @@ class App extends Component {
 
   handleQueryTemplateChange(query_templates) {
     this.setState({ query_templates: query_templates });
+  }
+
+  handleEnvChange(environment) {
+    this.setState({ environment: environment }, this.fetchChoicesForEnv);
   }
 
   handleServerChange(server) {
@@ -94,7 +104,9 @@ class App extends Component {
            servers={this.state.servers}
            queries={this.state.query_templates}
            server={this.state.server}
+           environment={this.state.environment}
            query_text={this.state.query_text}
+           onEnvChange={this.handleEnvChange}
            onServerChange={this.handleServerChange}
            onQueryTextChange={this.handleQueryTextChange}
            onExecuteButtonClick={this.handleExecuteButtonClick} />

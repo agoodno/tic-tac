@@ -5,10 +5,16 @@ class Entry extends Component {
   constructor(props) {
     super(props);
     this.state = { query_template: '' };
+    this.environments = [{"code": "inhouse", "description":"Inhouse"},{"code":"prod", "description":"Production"}];
+    this.handleEnvChange = this.handleEnvChange.bind(this);
     this.handleServerChange = this.handleServerChange.bind(this);
     this.handleQueryTemplateChange = this.handleQueryTemplateChange.bind(this);
     this.handleQueryTextChange = this.handleQueryTextChange.bind(this);
     this.handleExecuteButtonClick = this.handleExecuteButtonClick.bind(this);
+  }
+
+  handleEnvChange(evt) {
+    this.props.onEnvChange(evt.target.value);
   }
 
   handleServerChange(evt) {
@@ -30,9 +36,10 @@ class Entry extends Component {
   }
 
   render() {
-    console.log("Rerendering with: "); console.log(this.state);
+    console.log("Entry rendering with: "); console.log(this.state);
 
     var serverOptions = [<option value="">--Select--</option>];
+    var envOptions = [];
     var queryOptions = [<option value=""></option>];
 
     this.props.servers.forEach((server) => {
@@ -40,6 +47,10 @@ class Entry extends Component {
         var selected = (this.props.server === server.url);
         serverOptions.push(<option value={server.url} selected={selected}>{server.name}</option>);
       }
+    });
+    this.environments.forEach((environment) => {
+      var selected = (this.state.environment === environment.code);
+      envOptions.push(<option value={environment.code} selected={selected}>{environment.description}</option>);
     });
     this.props.queries.forEach((query) => {
       var selected = (this.state.query_template === query.text);
@@ -51,12 +62,18 @@ class Entry extends Component {
         <table>
           <thead>
             <tr>
+              <th>Environment</th>
               <th>Servers</th>
               <th>Query Templates</th>
             </tr>
           </thead>
           <tbody>
             <tr>
+              <td>
+                <select className="environments" onChange={this.handleEnvChange}>
+                  {envOptions}
+                </select>
+              </td>
               <td>
                 <select className="servers" onChange={this.handleServerChange}>
                   {serverOptions}
@@ -69,7 +86,7 @@ class Entry extends Component {
               </td>
             </tr>
             <tr>
-              <td colSpan="2">
+              <td colSpan="3">
                 <textarea
                   value={this.props.query_text}
                   onChange={this.handleQueryTextChange}
