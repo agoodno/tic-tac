@@ -33,7 +33,7 @@ class ResultsTable extends Component {
   // };
 
   render() {
-    console.log("Results rendering with: "); console.log(this.data);
+    // console.log("Results rendering with: "); console.log(this.data);
 
     return  (
       <div className="ResultsTable">

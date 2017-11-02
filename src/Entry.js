@@ -39,23 +39,20 @@ class Entry extends Component {
   render() {
     // console.log("Entry rendering with: "); console.log(this.state);
 
-    var serverOptions = [<option value="">--Select--</option>];
+    var serverOptions = [<option key="-1" value="">--Select--</option>];
     var envOptions = [];
-    var queryOptions = [<option value=""></option>];
+    var queryOptions = [<option key="-1" value=""></option>];
 
-    this.props.servers.forEach((server) => {
+    this.props.servers.forEach((server, index) => {
       if (!server.disabled) {
-        var selected = (this.props.server === server.url);
-        serverOptions.push(<option value={server.url} selected={selected} data-county-no={server.countyNo}>{server.name}</option>);
+        serverOptions.push(<option key={index} value={server.url} data-county-no={server.countyNo}>{server.name}</option>);
       }
     });
     this.environments.forEach((environment) => {
-      var selected = (this.state.environment === environment.code);
-      envOptions.push(<option value={environment.code} selected={selected}>{environment.description}</option>);
+      envOptions.push(<option key={environment.code} value={environment.code}>{environment.description}</option>);
     });
-    this.props.queries.forEach((query) => {
-      var selected = (this.state.query_template === query.text);
-      queryOptions.push(<option value={query.text} selected={selected}>{query.name}</option>);
+    this.props.queries.forEach((query, index) => {
+      queryOptions.push(<option key={index} value={query.text}>{query.name}</option>);
     });
 
     return (
@@ -71,17 +68,17 @@ class Entry extends Component {
           <tbody>
             <tr>
               <td>
-                <select className="environments" onChange={this.handleEnvChange}>
+                <select value={this.state.environment} className="environments" onChange={this.handleEnvChange}>
                   {envOptions}
                 </select>
               </td>
               <td>
-                <select className="servers" onChange={this.handleServerChange}>
+                <select value={this.state.server} className="servers" onChange={this.handleServerChange}>
                   {serverOptions}
                 </select>
               </td>
               <td>
-                <select className="queries" onChange={this.handleQueryTemplateChange}>
+                <select value={this.state.query_text} className="queries" onChange={this.handleQueryTemplateChange}>
                   {queryOptions}
                 </select>
               </td>
