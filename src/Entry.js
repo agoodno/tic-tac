@@ -4,7 +4,7 @@ import 'Entry.css';
 class Entry extends Component {
   constructor(props) {
     super(props);
-    this.state = { serverTemplates: [], queryTemplates: [], serverTemplate: '', queryTemplate: '', environment: 'inhouse' };
+    this.state = { serverTemplates: [], queryTemplates: [], serverTemplate: '', queryTemplate: '', environment: 'inhouse', server: '', countyNo: '', query: '' };
     this.environments = [{"code": "inhouse", "description":"Inhouse"},{"code":"prod", "description":"Production"}];
 
     this.storeTemplatesForEnv = this.storeTemplatesForEnv.bind(this);
@@ -15,6 +15,7 @@ class Entry extends Component {
     this.handleEnvChange = this.handleEnvChange.bind(this);
     this.handleServerTemplateChange = this.handleServerTemplateChange.bind(this);
     this.handleServerChange = this.handleServerChange.bind(this);
+    this.handleCountyNoChange = this.handleCountyNoChange.bind(this);
     this.handleQueryTemplateChange = this.handleQueryTemplateChange.bind(this);
     this.handleQueryChange = this.handleQueryChange.bind(this);
     this.handleExecuteButtonClick = this.handleExecuteButtonClick.bind(this);
@@ -45,32 +46,36 @@ class Entry extends Component {
   }
 
   handleServerTemplateChange(evt) {
-    // console.log("handing server temp change"); console.log(evt.target.value);
-    this.setState({ serverTemplate: evt.target.value });
+    var server = evt.target.value;
     var countyNo = evt.target.options[evt.target.selectedIndex].dataset.countyNo;
-    this.props.onServerChange(evt.target.value, countyNo);
+    console.log("handing server temp change"); console.log(server);
+    console.log("handing server temp change c"); console.log(countyNo);
+    this.setState({ serverTemplate: server, server: server, countyNo: countyNo });
   }
 
   handleServerChange(evt) {
     // console.log("handing server change"); console.log(evt.target.value);
-    this.setState({ serverTemplate: '' });
-    this.props.onServerChange(evt.target.value, '');
+    this.setState({ serverTemplate: '', server: evt.target.value, countyNo: '' });
+  }
+
+  handleCountyNoChange(evt) {
+    // console.log("handing server change"); console.log(evt.target.value);
+    this.setState({ countyNo: evt.target.value });
   }
 
   handleQueryTemplateChange(evt) {
     // console.log("handing query temp change"); console.log(evt.target.value);
-    this.setState({ queryTemplate: evt.target.value });
-    this.props.onQueryChange(evt.target.value);
+    this.setState({ query: evt.target.value, queryTemplate: evt.target.value });
   }
 
   handleQueryChange(evt) {
-    this.setState({ queryTemplate: '' });
-    this.props.onQueryChange(evt.target.value);
+    this.setState({ query: evt.target.value, queryTemplate: '' });
   }
 
   handleExecuteButtonClick(evt) {
     // console.log("handling button click"); console.log(evt.target.value);
-    this.props.onExecuteButtonClick(evt.target.value);
+    var finalQuery = this.state.query.replace(/\$countyNo/, this.state.countyNo);
+    this.props.onExecuteButtonClick(this.state.server, finalQuery);
   }
 
   render() {
@@ -95,7 +100,7 @@ class Entry extends Component {
     return (
       <div className="Entry">
         <div className="row">
-          <div className="form-group col-md-3">
+          <div className="form-group col-md-2">
             <label>Environment</label>
             <select
                id="environments"
@@ -110,7 +115,7 @@ class Entry extends Component {
               <small id="environmentsHelp" className="form-text text-muted">Narrows the Servers and Query Templates choices.</small>
             </div>
           </div>
-          <div className="form-group col-md-3">
+          <div className="form-group col-md-2">
             <label htmlFor="serverTemplates">Server Templates</label>
             <select
                id="serverTemplates"
@@ -127,7 +132,7 @@ class Entry extends Component {
             <label htmlFor="server">Server</label>
             <input id="server"
                    type="text"
-                   value={this.props.server}
+                   value={this.state.server}
                    className="form-control"
                    tabIndex="0"
                    aria-describedby="serverHelp"
@@ -139,33 +144,36 @@ class Entry extends Component {
             <label htmlFor="countyNo">County No</label>
             <input id="countyNo"
                    type="text"
-                   value={this.props.countyNo}
+                   value={this.state.countyNo}
                    size="4"
                    maxLength="2"
                    className="form-control"
                    tabIndex="0"
                    aria-describedby="countyNoHelp"
-                   placeholder="Enter countyNo to use with this server" />
+                   placeholder="Enter countyNo to use with this server"
+                   onChange={this.handleCountyNoChange} />
             <small id="countyNoHelp" className="form-text text-muted">This will be substituted in wherever the $countyNo variable is found.</small>
           </div>
         </div>
-        <div className="form-group">
-          <label htmlFor="queryTemplates">Query Templates</label>
-          <select
-             id="queryTemplates"
-             value={this.state.queryTemplate}
-             className="queries form-control"
-             tabIndex="3"
-             onChange={this.handleQueryTemplateChange}>
-            {queryOptions}
-          </select>
+        <div className="row">
+          <div className="form-group col-md-3">
+            <label htmlFor="queryTemplates">Query Templates</label>
+            <select
+               id="queryTemplates"
+               value={this.state.queryTemplate}
+               className="queries form-control"
+               tabIndex="3"
+               onChange={this.handleQueryTemplateChange}>
+              {queryOptions}
+            </select>
+          </div>
         </div>
         <div className="form-group">
           <textarea
              id="query"
              className="form-control"
              tabIndex="4"
-             value={this.props.query}
+             value={this.state.query}
              onChange={this.handleQueryChange}
              aria-describedby="queryHelp"
              rows="5"

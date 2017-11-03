@@ -23,9 +23,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { server: '', countyNo: '', query: '', results: { columns: [], rows: [] } };
-    this.handleServerChange = this.handleServerChange.bind(this);
-    this.handleQueryChange = this.handleQueryChange.bind(this);
+    this.state = { results: { columns: [], rows: [] } };
     this.handleResultsChange = this.handleResultsChange.bind(this);
     this.handleExecuteButtonClick = this.handleExecuteButtonClick.bind(this);
     this.fetchServerTemplatesForEnv = this.fetchServerTemplatesForEnv.bind(this);
@@ -51,25 +49,15 @@ class App extends Component {
       });
   };
 
-  handleServerChange(server, countyNo) {
-    this.setState({ server: server, countyNo: countyNo });
-  }
-
-  handleQueryChange(query) {
-    this.setState({ query: query });
-  }
-
   handleResultsChange(results) {
     this.setState({ results: results });
   }
 
-  handleExecuteButtonClick(evt) {
-    console.log("Executing with: "); console.log(this.state);
-
+  handleExecuteButtonClick(server, query) {
     var options = {
       body: JSON.stringify({
-        connection_string: this.state.server,
-        query_text: this.queryText()
+        connection_string: server,
+        query_text: query
       }),
       ...POST_OPTIONS
     };
@@ -80,10 +68,6 @@ class App extends Component {
       this.handleResultsChange);
   }
 
-  queryText() {
-    return this.state.query.replace(/\$countyNo/, this.state.countyNo);
-  }
-
   render() {
     console.log("App rendering with: "); console.log(this.state);
 
@@ -92,11 +76,6 @@ class App extends Component {
         <Entry
            fetchServerTemplatesForEnv={this.fetchServerTemplatesForEnv}
            fetchQueryTemplatesForEnv={this.fetchQueryTemplatesForEnv}
-           server={this.state.server}
-           countyNo={this.state.countyNo}
-           query={this.state.query}
-           onServerChange={this.handleServerChange}
-           onQueryChange={this.handleQueryChange}
            onExecuteButtonClick={this.handleExecuteButtonClick} />
         <ResultsTable
            data={this.state.results} />
