@@ -4,8 +4,14 @@ import 'Entry.css';
 class Entry extends Component {
   constructor(props) {
     super(props);
-    this.state = { serverTemplate: '', queryTemplate: '' };
+    this.state = { serverTemplates: [], queryTemplates: [], serverTemplate: '', queryTemplate: '', environment: 'inhouse' };
     this.environments = [{"code": "inhouse", "description":"Inhouse"},{"code":"prod", "description":"Production"}];
+
+    this.storeTemplatesForEnv = this.storeTemplatesForEnv.bind(this);
+
+    this.storesServerTemplatesInState = this.storesServerTemplatesInState.bind(this);
+    this.storesQueryTemplatesInState = this.storesQueryTemplatesInState.bind(this);
+
     this.handleEnvChange = this.handleEnvChange.bind(this);
     this.handleServerTemplateChange = this.handleServerTemplateChange.bind(this);
     this.handleServerChange = this.handleServerChange.bind(this);
@@ -14,8 +20,28 @@ class Entry extends Component {
     this.handleExecuteButtonClick = this.handleExecuteButtonClick.bind(this);
   }
 
+  componentDidMount() {
+    this.storeTemplatesForEnv();
+  }
+
+  storeTemplatesForEnv() {
+    this.props.fetchServerTemplatesForEnv(this.state.environment, this.storesServerTemplatesInState);
+    this.props.fetchQueryTemplatesForEnv(this.state.environment, this.storesQueryTemplatesInState);
+  }
+
   handleEnvChange(evt) {
-    this.props.onEnvChange(evt.target.value);
+    // console.log('handling change to env'); console.log(evt.target.value);
+    this.setState({ environment: evt.target.value }, this.storeTemplatesForEnv);
+  }
+
+  storesServerTemplatesInState(serverTemplates) {
+    // console.log('storing server temps'); console.log(serverTemplates);
+    this.setState({ serverTemplates: serverTemplates });
+  }
+
+  storesQueryTemplatesInState(queryTemplates) {
+    // console.log('storing query temps'); console.log(queryTemplates);
+    this.setState({ queryTemplates: queryTemplates });
   }
 
   handleServerTemplateChange(evt) {
@@ -43,7 +69,7 @@ class Entry extends Component {
   }
 
   handleExecuteButtonClick(evt) {
-    console.log("handling button click"); console.log(evt.target.value);
+    // console.log("handling button click"); console.log(evt.target.value);
     this.props.onExecuteButtonClick(evt.target.value);
   }
 
@@ -57,12 +83,12 @@ class Entry extends Component {
     this.environments.forEach((environment) => {
       envOptions.push(<option key={environment.code} value={environment.code}>{environment.description}</option>);
     });
-    this.props.serverTemplates.forEach((server, index) => {
+    this.state.serverTemplates.forEach((server, index) => {
       if (!server.disabled) {
         serverOptions.push(<option key={index} value={server.url} data-county-no={server.countyNo}>{server.name}</option>);
       }
     });
-    this.props.queryTemplates.forEach((query, index) => {
+    this.state.queryTemplates.forEach((query, index) => {
       queryOptions.push(<option key={index} value={query.text}>{query.name}</option>);
     });
 
@@ -74,7 +100,7 @@ class Entry extends Component {
             <select
                id="environments"
                tabIndex="1"
-               value={this.props.environment}
+               value={this.state.environment}
                className="environments form-control"
                aria-describedby="environmentsHelp"
                onChange={this.handleEnvChange}>

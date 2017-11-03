@@ -23,23 +23,21 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { serverTemplates: [], queryTemplates: [], environment: 'inhouse', server: '', countyNo: '', query: '', results: { columns: [], rows: [] } };
-    this.handleEnvChange = this.handleEnvChange.bind(this);
-    this.handleServerTemplatesChange = this.handleServerTemplatesChange.bind(this);
-    this.handleQueryTemplateChange = this.handleQueryTemplateChange.bind(this);
+    this.state = { server: '', countyNo: '', query: '', results: { columns: [], rows: [] } };
     this.handleServerChange = this.handleServerChange.bind(this);
     this.handleQueryChange = this.handleQueryChange.bind(this);
     this.handleResultsChange = this.handleResultsChange.bind(this);
     this.handleExecuteButtonClick = this.handleExecuteButtonClick.bind(this);
+    this.fetchServerTemplatesForEnv = this.fetchServerTemplatesForEnv.bind(this);
+    this.fetchQueryTemplatesForEnv = this.fetchQueryTemplatesForEnv.bind(this);
   }
 
-  componentDidMount() {
-    this.fetchChoicesForEnv();
+  fetchServerTemplatesForEnv(env, storesServerTemplates) {
+    this.fetchData(`http://localhost:3001/server_templates?env=${env}`, GET_OPTIONS, storesServerTemplates);
   }
 
-  fetchChoicesForEnv() {
-    this.fetchData(`http://localhost:3001/servers?env=${this.state.environment}`, GET_OPTIONS, this.handleServerTemplatesChange);
-    this.fetchData(`http://localhost:3001/query_templates?env=${this.state.environment}`, GET_OPTIONS, this.handleQueryTemplateChange);
+  fetchQueryTemplatesForEnv(env, storesQueryTemplates) {
+    this.fetchData(`http://localhost:3001/query_templates?env=${env}`, GET_OPTIONS, storesQueryTemplates);
   }
 
   fetchData(url, options, handler) {
@@ -53,20 +51,8 @@ class App extends Component {
       });
   };
 
-  handleEnvChange(environment) {
-    this.setState({ environment: environment }, this.fetchChoicesForEnv);
-  }
-
-  handleServerTemplatesChange(serverTemplates) {
-    this.setState({ serverTemplates: serverTemplates });
-  }
-
   handleServerChange(server, countyNo) {
     this.setState({ server: server, countyNo: countyNo });
-  }
-
-  handleQueryTemplateChange(queryTemplates) {
-    this.setState({ queryTemplates: queryTemplates });
   }
 
   handleQueryChange(query) {
@@ -104,13 +90,11 @@ class App extends Component {
     return (
       <div className="App container-fluid">
         <Entry
-           environment={this.state.environment}
-           serverTemplates={this.state.serverTemplates}
+           fetchServerTemplatesForEnv={this.fetchServerTemplatesForEnv}
+           fetchQueryTemplatesForEnv={this.fetchQueryTemplatesForEnv}
            server={this.state.server}
            countyNo={this.state.countyNo}
-           queryTemplates={this.state.queryTemplates}
            query={this.state.query}
-           onEnvChange={this.handleEnvChange}
            onServerChange={this.handleServerChange}
            onQueryChange={this.handleQueryChange}
            onExecuteButtonClick={this.handleExecuteButtonClick} />
