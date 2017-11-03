@@ -3,3 +3,7 @@
   text-align: left;
   width: 98%;
 }
+
+.error {
+  color: red;
+}

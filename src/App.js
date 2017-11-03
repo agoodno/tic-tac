@@ -45,7 +45,7 @@ class App extends Component {
       })
       .then(handler)
       .catch(function(ex) {
-        console.error('parsing failed', ex);
+        console.error(`Something went wrong: ${ex}`);
       });
   };
 

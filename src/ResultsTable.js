@@ -34,18 +34,23 @@ class ResultsTable extends Component {
 
   render() {
     // console.log("Results rendering with: "); console.log(this.data);
-
-    return  (
-      <div className="ResultsTable">
-        <ReactDataGrid
-           columns={this.makeCols(this.props.data.columns)}
-           rowGetter={this.rowGetter}
-           rowsCount={this.props.data.rows.length}
-           minHeight={500}
-           minColumnWidth={120}
-           emptyRowsView={NoResultsTable} />
-      </div>
-    );
+    if (!(Array.isArray(this.props.data))) {
+      return  (
+        <div className="ResultsTable">
+          <ReactDataGrid
+             columns={this.makeCols(this.props.data.columns)}
+             rowGetter={this.rowGetter}
+             rowsCount={this.props.data.rows.length}
+             minHeight={500}
+             minColumnWidth={120}
+             emptyRowsView={NoResultsTable} />
+        </div>);
+    } else {
+      return  (
+        <div className="error">
+          {this.props.data[0]}
+        </div>);
+    }
   }
 }
 
