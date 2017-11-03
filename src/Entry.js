@@ -133,6 +133,8 @@ class Entry extends Component {
              onChange={this.handleQueryTemplateChange}>
             {queryOptions}
           </select>
+        </div>
+        <div className="form-group">
           <textarea
              id="query"
              className="form-control"
