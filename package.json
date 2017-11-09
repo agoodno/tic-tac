@@ -4,15 +4,22 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "prop-types": "^15.6.0",
     "react": "^16.0.0",
     "react-data-grid": "^2.0.61",
     "react-dom": "^16.0.0",
-    "react-scripts": "1.0.14"
+    "react-redux": "^5.0.6",
+    "react-scripts": "1.0.14",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0"
   },
   "scripts": {
     "start": "NODE_PATH=src:src/components:src/containers react-scripts start",
     "build": "NODE_PATH=src:src/components:src/containers react-scripts build",
     "test": "NODE_PATH=src:src/components:src/containers react-scripts test --env=jsdom",
     "eject": "NODE_PATH=src:src/components:src/containers react-scripts eject"
+  },
+  "devDependencies": {
+    "redux-devtools": "^3.4.0"
   }
 }

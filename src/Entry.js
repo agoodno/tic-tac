@@ -1,101 +1,98 @@
-import React, { Component } from 'react';
+/* eslint react/no-deprecated: 0 */
+
+import './fix-prop-types';
+import React, { Component, PropTypes } from 'react';
+//import PropTypes from 'prop-types';
+
+import { changeEnvironment, changeServerTemplate, changeQueryTemplate } from './actions';
 import 'Entry.css';
+
+const envOptions = (environments) => {
+  var options = [];
+  environments.forEach((environment) => {
+    options.push(<option key={environment.code} value={environment.code}>{environment.description}</option>);
+  });
+  return options;
+};
+
+
+const serverOptions = (serverTemplates) => {
+  var options = [<option key="-1" value=""></option>];
+  serverTemplates.forEach((server, index) => {
+//      if (!server.disabled) {
+    options.push(<option key={index} value={server.url} data-county-no={server.countyNo}>{server.name}</option>);
+  });
+  return options;
+};
+
+const queryOptions = (queryTemplates) => {
+  var options = [<option key="-1" value=""></option>];
+  queryTemplates.forEach((query, index) => {
+    options.push(<option key={index} value={query.text}>{query.name}</option>);
+  });
+  return options;
+};
 
 class Entry extends Component {
   constructor(props) {
     super(props);
-    this.state = { serverTemplates: [], queryTemplates: [], serverTemplate: '', queryTemplate: '', environment: 'inhouse', server: '', countyNo: '', query: '' };
-    this.environments = [{"code": "inhouse", "description":"Inhouse"},{"code":"prod", "description":"Production"}];
-
-    this.storeTemplatesForEnv = this.storeTemplatesForEnv.bind(this);
-
-    this.storesServerTemplatesInState = this.storesServerTemplatesInState.bind(this);
-    this.storesQueryTemplatesInState = this.storesQueryTemplatesInState.bind(this);
-
-    this.handleEnvChange = this.handleEnvChange.bind(this);
-    this.handleServerTemplateChange = this.handleServerTemplateChange.bind(this);
-    this.handleServerChange = this.handleServerChange.bind(this);
-    this.handleCountyNoChange = this.handleCountyNoChange.bind(this);
-    this.handleQueryTemplateChange = this.handleQueryTemplateChange.bind(this);
-    this.handleQueryChange = this.handleQueryChange.bind(this);
     this.handleExecuteButtonClick = this.handleExecuteButtonClick.bind(this);
+    // this.state = { serverTemplates: [], queryTemplates: [] };
+
+    // this.storeTemplatesForEnv = this.storeTemplatesForEnv.bind(this);
+    // this.storesServerTemplatesInState = this.storesServerTemplatesInState.bind(this);
   }
 
   componentDidMount() {
-    this.storeTemplatesForEnv();
+    const { store } = this.context;
+    this.unsubscribe = store.subscribe(() =>
+      this.forceUpdate()
+    );
+
+    //console.log(`mount env = ${store.getState().env}`);
+    //this.storeTemplatesForEnv(store.getState().env);
   }
 
-  storeTemplatesForEnv() {
-    this.props.fetchServerTemplatesForEnv(this.state.environment, this.storesServerTemplatesInState);
-    this.props.fetchQueryTemplatesForEnv(this.state.environment, this.storesQueryTemplatesInState);
+  // componentDidUpdate() {
+  //   const { store } = this.context;
+  //   console.log(`update env = ${store.getState().env}`);
+  //   this.storeTemplatesForEnv(store.getState().env);
+  // }
+
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
-  handleEnvChange(evt) {
-    // console.log('handling change to env'); console.log(evt.target.value);
-    this.setState({ environment: evt.target.value }, this.storeTemplatesForEnv);
-  }
+//   storeTemplatesForEnv(env) {
+//     console.log('storing for env'); console.log(env);
+//     this.props.fetchServerTemplatesForEnv(env, this.storesServerTemplatesInState);
+// //    this.props.fetchQueryTemplatesForEnv(env, this.storesQueryTemplatesInState);
+//   }
 
-  storesServerTemplatesInState(serverTemplates) {
-    // console.log('storing server temps'); console.log(serverTemplates);
-    this.setState({ serverTemplates: serverTemplates });
-  }
-
-  storesQueryTemplatesInState(queryTemplates) {
-    // console.log('storing query temps'); console.log(queryTemplates);
-    this.setState({ queryTemplates: queryTemplates });
-  }
-
-  handleServerTemplateChange(evt) {
-    var server = evt.target.value;
-    var countyNo = evt.target.options[evt.target.selectedIndex].dataset.countyNo;
-    console.log("handing server temp change"); console.log(server);
-    console.log("handing server temp change c"); console.log(countyNo);
-    this.setState({ serverTemplate: server, server: server, countyNo: countyNo });
-  }
-
-  handleServerChange(evt) {
-    // console.log("handing server change"); console.log(evt.target.value);
-    this.setState({ serverTemplate: '', server: evt.target.value, countyNo: '' });
-  }
-
-  handleCountyNoChange(evt) {
-    // console.log("handing server change"); console.log(evt.target.value);
-    this.setState({ countyNo: evt.target.value });
-  }
-
-  handleQueryTemplateChange(evt) {
-    // console.log("handing query temp change"); console.log(evt.target.value);
-    this.setState({ query: evt.target.value, queryTemplate: evt.target.value });
-  }
-
-  handleQueryChange(evt) {
-    this.setState({ query: evt.target.value, queryTemplate: '' });
-  }
+//   storesServerTemplatesInState(serverTemplates) {
+//     // console.log('storing server temps'); console.log(serverTemplates);
+//     // const { store } = this.context;
+//     //store.dispatch(loadServerTemplates(serverTemplates));
+//     //this.setState({ serverTemplates: serverTemplates });
+//   }
 
   handleExecuteButtonClick(evt) {
     // console.log("handling button click"); console.log(evt.target.value);
-    var finalQuery = this.state.query.replace(/\$countyNo/, this.state.countyNo);
-    this.props.onExecuteButtonClick(this.state.server, finalQuery);
+    const { store } = this.context;
+    const state = store.getState();
+
+    console.log(`exec state=${JSON.stringify(state)}`);
+
+    var finalQuery = state.query.replace(/\$countyNo/, state.countyNo);
+    this.props.onExecuteButtonClick(state.server, finalQuery);
   }
 
   render() {
-    console.log("Entry rendering with: "); console.log(this.state);
+    const props = this.props;
+    const { store } = this.context;
+    const state = store.getState();
 
-    var serverOptions = [<option key="-1" value=""></option>];
-    var envOptions = [];
-    var queryOptions = [<option key="-1" value=""></option>];
-
-    this.environments.forEach((environment) => {
-      envOptions.push(<option key={environment.code} value={environment.code}>{environment.description}</option>);
-    });
-    this.state.serverTemplates.forEach((server, index) => {
-      if (!server.disabled) {
-        serverOptions.push(<option key={index} value={server.url} data-county-no={server.countyNo}>{server.name}</option>);
-      }
-    });
-    this.state.queryTemplates.forEach((query, index) => {
-      queryOptions.push(<option key={index} value={query.text}>{query.name}</option>);
-    });
+    // console.log(`state=${JSON.stringify(state)}`);
 
     return (
       <div className="Entry">
@@ -104,12 +101,12 @@ class Entry extends Component {
             <label>Environment</label>
             <select
                id="environments"
+               value={state.env}
                tabIndex="1"
-               value={this.state.environment}
                className="environments form-control"
                aria-describedby="environmentsHelp"
-               onChange={this.handleEnvChange}>
-              {envOptions}
+               onChange={(evt) => store.dispatch(changeEnvironment(evt.target.value))}>
+              {envOptions(props.environments)}
             </select>
             <div>
               <small id="environmentsHelp" className="form-text text-muted">Narrows the Servers and Query Templates choices.</small>
@@ -119,12 +116,12 @@ class Entry extends Component {
             <label htmlFor="serverTemplates">Server Templates</label>
             <select
                id="serverTemplates"
-               value={this.state.serverTemplate}
+               value={state.serverTemplate}
                className="servers form-control"
                tabIndex="2"
                aria-describedby="serverTemplatesHelp"
-               onChange={this.handleServerTemplateChange}>
-              {serverOptions}
+               onChange={(evt) => store.dispatch(changeServerTemplate(evt.target.value, evt.target.options[evt.target.selectedIndex].dataset.countyNo))}>
+              {serverOptions(state.serverTemplates)}
             </select>
             <small id="serverTemplatesHelp" className="form-text text-muted">Pre-defined servers.</small>
           </div>
@@ -132,26 +129,24 @@ class Entry extends Component {
             <label htmlFor="server">Server</label>
             <input id="server"
                    type="text"
-                   value={this.state.server}
+                   value={state.server}
                    className="form-control"
                    tabIndex="0"
                    aria-describedby="serverHelp"
-                   placeholder="Enter database url or select one from the dropdown"
-                   onChange={this.handleServerChange} />
+                   placeholder="Enter database url or select one from the dropdown" />
             <small id="serverHelp" className="form-text text-muted">Server to run the query against.</small>
           </div>
           <div className="form-group col-md-3">
             <label htmlFor="countyNo">County No</label>
             <input id="countyNo"
                    type="text"
-                   value={this.state.countyNo}
+                   value={state.countyNo}
                    size="4"
                    maxLength="2"
                    className="form-control"
                    tabIndex="0"
                    aria-describedby="countyNoHelp"
-                   placeholder="Enter countyNo to use with this server"
-                   onChange={this.handleCountyNoChange} />
+                   placeholder="Enter countyNo to use with this server" />
             <small id="countyNoHelp" className="form-text text-muted">This will be substituted in wherever the $countyNo variable is found.</small>
           </div>
         </div>
@@ -160,21 +155,20 @@ class Entry extends Component {
             <label htmlFor="queryTemplates">Query Templates</label>
             <select
                id="queryTemplates"
-               value={this.state.queryTemplate}
+               value={state.queryTemplate}
                className="queries form-control"
                tabIndex="3"
-               onChange={this.handleQueryTemplateChange}>
-              {queryOptions}
+               onChange={(evt) => store.dispatch(changeQueryTemplate(evt.target.value))}>
+              {queryOptions(state.queryTemplates)}
             </select>
           </div>
         </div>
         <div className="form-group">
           <textarea
              id="query"
+             value={state.query}
              className="form-control"
              tabIndex="4"
-             value={this.state.query}
-             onChange={this.handleQueryChange}
              aria-describedby="queryHelp"
              rows="5"
              cols="100"
@@ -189,6 +183,10 @@ class Entry extends Component {
       </div>
     );
   }
-}
+};
+
+Entry.contextTypes = {
+  store: PropTypes.object
+};
 
 export default Entry;

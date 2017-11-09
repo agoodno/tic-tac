@@ -1,9 +1,12 @@
+/* eslint react/no-deprecated: 0 */
+
 //https://github.com/adazzle/react-data-grid/issues/744
 // Only need to do this once.
 //import './fix-create-class';
 import './fix-prop-types';
 
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
+//import PropTypes from 'prop-types';
 import 'ResultsTable.css';
 import ReactDataGrid from 'react-data-grid';
 
@@ -53,5 +56,8 @@ class ResultsTable extends Component {
     }
   }
 }
+ResultsTable.contextTypes = {
+  store: PropTypes.object
+};
 
 export default ResultsTable;

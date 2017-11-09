@@ -19,6 +19,11 @@ const POST_OPTIONS = {
   }
 };
 
+var ccap_environments = [
+  {"code": "inhouse", "description":"Inhouse"},
+  {"code":"prod", "description":"Production"}
+];
+
 class App extends Component {
 
   constructor(props) {
@@ -69,19 +74,18 @@ class App extends Component {
   }
 
   render() {
-    console.log("App rendering with: "); console.log(this.state);
-
     return (
       <div className="App container-fluid">
         <Entry
            fetchServerTemplatesForEnv={this.fetchServerTemplatesForEnv}
            fetchQueryTemplatesForEnv={this.fetchQueryTemplatesForEnv}
+           environments={ccap_environments}
            onExecuteButtonClick={this.handleExecuteButtonClick} />
         <ResultsTable
            data={this.state.results} />
       </div>
     );
   }
-}
+};
 
 export default App;
