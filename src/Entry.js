@@ -1,10 +1,10 @@
 /* eslint react/no-deprecated: 0 */
 
 import './fix-prop-types';
-import React, { Component, PropTypes } from 'react';
-//import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-import { changeEnvironment, changeServerTemplate, changeQueryTemplate } from './actions';
+import { changeEnvironment, changeServerTemplate, changeQueryTemplate, loadServerTemplates, apologize } from './actions';
 import 'Entry.css';
 
 const envOptions = (environments) => {
@@ -18,7 +18,7 @@ const envOptions = (environments) => {
 
 const serverOptions = (serverTemplates) => {
   var options = [<option key="-1" value=""></option>];
-  serverTemplates.forEach((server, index) => {
+  serverTemplates && serverTemplates.forEach((server, index) => {
 //      if (!server.disabled) {
     options.push(<option key={index} value={server.url} data-county-no={server.countyNo}>{server.name}</option>);
   });
@@ -27,18 +27,64 @@ const serverOptions = (serverTemplates) => {
 
 const queryOptions = (queryTemplates) => {
   var options = [<option key="-1" value=""></option>];
-  queryTemplates.forEach((query, index) => {
+  queryTemplates && queryTemplates.forEach((query, index) => {
     options.push(<option key={index} value={query.text}>{query.name}</option>);
   });
   return options;
 };
+
+
+const GET_OPTIONS = {
+  method: 'GET',
+  headers: {
+    'Accept': 'application/json'
+  }
+};
+
+// function fetchServerTemplatesForEnv(env, storesServerTemplates) {
+//   return fetchData(`http://localhost:3001/server_templates?env=${env}`, GET_OPTIONS, storesServerTemplates);
+// }
+
+// function fetchQueryTemplatesForEnv(env, storesQueryTemplates) {
+//   return fetchData(`http://localhost:3001/query_templates?env=${env}`, GET_OPTIONS, storesQueryTemplates);
+// }
+
+// function fetchData(url, options) {
+//   fetch(url, options)
+//     .then(function(response) {
+//       return response.json();
+//     })
+//     .catch(function(ex) {
+//       console.error(`Something went wrong: ${ex}`);
+//     });
+// };
+
+// function apologize(error) {
+//   return {
+//     type: 'APOLOGIZE',
+//     error
+//   };
+// }
+
+function populateServerTemplates(env) {
+  return function (dispatch) {
+    return fetch(`http://localhost:3001/server_templates?env=${env}`, GET_OPTIONS)
+      .then(function(response) {
+        return response.json();
+      }).then(
+        serverTemplates => dispatch(loadServerTemplates(serverTemplates)),
+        error => dispatch(apologize(error))
+      ).catch(function(ex) {
+        console.error(`Something went wrong: ${ex}`);
+      });
+  };
+}
 
 class Entry extends Component {
   constructor(props) {
     super(props);
     this.handleExecuteButtonClick = this.handleExecuteButtonClick.bind(this);
     // this.state = { serverTemplates: [], queryTemplates: [] };
-
     // this.storeTemplatesForEnv = this.storeTemplatesForEnv.bind(this);
     // this.storesServerTemplatesInState = this.storesServerTemplatesInState.bind(this);
   }
@@ -49,8 +95,20 @@ class Entry extends Component {
       this.forceUpdate()
     );
 
-    //console.log(`mount env = ${store.getState().env}`);
+    console.log(`mount state = ${JSON.stringify(store.getState())}`);
+    console.log(`mount env = ${store.getState().env}`);
     //this.storeTemplatesForEnv(store.getState().env);
+    populateServerTemplates(store.getState().env);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log(`nextProps=${nextProps}`);
+    const { store } = this.context;
+    if (nextProps.env !== this.props.env) {
+      this.props.dispatch(
+        populateServerTemplates(store.getState().env)
+      );
+    }
   }
 
   // componentDidUpdate() {
@@ -63,11 +121,12 @@ class Entry extends Component {
     this.unsubscribe();
   }
 
-//   storeTemplatesForEnv(env) {
-//     console.log('storing for env'); console.log(env);
-//     this.props.fetchServerTemplatesForEnv(env, this.storesServerTemplatesInState);
-// //    this.props.fetchQueryTemplatesForEnv(env, this.storesQueryTemplatesInState);
-//   }
+   // storeTemplatesForEnv(env) {
+   //   console.log('storing for env'); console.log(env);
+   //   //this.props.fetchServerTemplatesForEnv(env, this.storesServerTemplatesInState);
+   //   store.dispatch(populateServerTemplates(env));
+   //   //    this.props.fetchQueryTemplatesForEnv(env, this.storesQueryTemplatesInState);
+   // }
 
 //   storesServerTemplatesInState(serverTemplates) {
 //     // console.log('storing server temps'); console.log(serverTemplates);

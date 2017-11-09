@@ -3,13 +3,14 @@ import 'App.css';
 import Entry from 'Entry';
 import ResultsTable from 'ResultsTable';
 //import fetchData from 'utils';
+//import { loadServerTemplates } from './actions';
 
-const GET_OPTIONS = {
-  method: 'GET',
-  headers: {
-    'Accept': 'application/json'
-  }
-};
+// const GET_OPTIONS = {
+//   method: 'GET',
+//   headers: {
+//     'Accept': 'application/json'
+//   }
+// };
 
 const POST_OPTIONS = {
   method: 'POST',
@@ -24,6 +25,8 @@ var ccap_environments = [
   {"code":"prod", "description":"Production"}
 ];
 
+
+
 class App extends Component {
 
   constructor(props) {
@@ -31,28 +34,7 @@ class App extends Component {
     this.state = { results: { columns: [], rows: [] } };
     this.handleResultsChange = this.handleResultsChange.bind(this);
     this.handleExecuteButtonClick = this.handleExecuteButtonClick.bind(this);
-    this.fetchServerTemplatesForEnv = this.fetchServerTemplatesForEnv.bind(this);
-    this.fetchQueryTemplatesForEnv = this.fetchQueryTemplatesForEnv.bind(this);
   }
-
-  fetchServerTemplatesForEnv(env, storesServerTemplates) {
-    this.fetchData(`http://localhost:3001/server_templates?env=${env}`, GET_OPTIONS, storesServerTemplates);
-  }
-
-  fetchQueryTemplatesForEnv(env, storesQueryTemplates) {
-    this.fetchData(`http://localhost:3001/query_templates?env=${env}`, GET_OPTIONS, storesQueryTemplates);
-  }
-
-  fetchData(url, options, handler) {
-    fetch(url, options)
-      .then(function(response) {
-        return response.json();
-      })
-      .then(handler)
-      .catch(function(ex) {
-        console.error(`Something went wrong: ${ex}`);
-      });
-  };
 
   handleResultsChange(results) {
     this.setState({ results: results });
@@ -77,8 +59,6 @@ class App extends Component {
     return (
       <div className="App container-fluid">
         <Entry
-           fetchServerTemplatesForEnv={this.fetchServerTemplatesForEnv}
-           fetchQueryTemplatesForEnv={this.fetchQueryTemplatesForEnv}
            environments={ccap_environments}
            onExecuteButtonClick={this.handleExecuteButtonClick} />
         <ResultsTable

@@ -16,11 +16,11 @@ const store = createStore(
 );
 /* eslint-enable */
 
-// const writeOut = () => {
-//   console.log(JSON.stringify(store.getState()));
-// };
+const writeOut = () => {
+  console.log(`state: ${JSON.stringify(store.getState())}`);
+};
 
-// store.subscribe(writeOut);
+store.subscribe(writeOut);
 
 ReactDOM.render(
   <Provider store={store}>
