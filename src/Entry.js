@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import 'Entry.css';
+import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
+import ServerManager from 'ServerManager';
 
 class Entry extends Component {
   constructor(props) {
@@ -47,41 +49,44 @@ class Entry extends Component {
     });
 
     return (
-      <div className="Entry">
-        <table>
-          <thead>
-            <tr>
-              <th>Servers</th>
-              <th>Query Templates</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <select className="servers" onChange={this.handleServerChange}>
-                  {serverOptions}
-                </select>
-              </td>
-              <td>
-                <select className="queries" onChange={this.handleQueryTemplateChange}>
-                  {queryOptions}
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td colSpan="2">
-                <textarea
-                  value={this.props.query_text}
-                  onChange={this.handleQueryTextChange}
-                  rows="5"
-                  cols="100"
-                  placeholder="Type your query here or select one of the common query templates."/>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <button onClick={this.handleExecuteButtonClick}>Execute</button>
-      </div>
+      <Router>
+        <div className="Entry">
+          <Route path="/servers" component={ServerManager}/>
+          <table>
+            <thead>
+              <tr>
+                <th><Link to="/servers">Servers</Link></th>
+                <th>Query Templates</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <select className="servers" onChange={this.handleServerChange}>
+                    {serverOptions}
+                  </select>
+                </td>
+                <td>
+                  <select className="queries" onChange={this.handleQueryTemplateChange}>
+                    {queryOptions}
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td colSpan="2">
+                  <textarea
+                     value={this.props.query_text}
+                     onChange={this.handleQueryTextChange}
+                     rows="5"
+                     cols="100"
+                     placeholder="Type your query here or select one of the common query templates."/>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <button onClick={this.handleExecuteButtonClick}>Execute</button>
+        </div>
+      </Router>
     );
   }
 }
