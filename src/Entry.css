@@ -1,24 +1,22 @@
 .Entry {
   padding: 20px;
-}
-
-h3 {
-  font-size: large;
-}
-
-.Entry table {
   margin-left: auto;
   margin-right: auto;
   text-align: left;
 }
 
-.Entry th, .Entry td {
-  padding: 2px 50px 2px 50px;
-}
-
-textarea, button {
+.Entry button {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 20px;
+  text-align: center;
+}
+/*
+select {
+  margin-left: 20px;
+}
+*/
+
+.form-row > .form-group {
+  padding-left: 0px;
 }
