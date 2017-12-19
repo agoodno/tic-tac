@@ -23,7 +23,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { results: { columns: [], rows: [] } };
+    this.state = { results: { columns: [], rows: [] }, resultsLoading: false };
     this.handleResultsChange = this.handleResultsChange.bind(this);
     this.handleExecuteButtonClick = this.handleExecuteButtonClick.bind(this);
     this.fetchServerTemplatesForEnv = this.fetchServerTemplatesForEnv.bind(this);
@@ -50,10 +50,12 @@ class App extends Component {
   };
 
   handleResultsChange(results) {
-    this.setState({ results: results });
+    this.setState({ results: results, resultsLoading: false });
   }
 
   handleExecuteButtonClick(server, query) {
+    this.setState({ resultsLoading: true });
+
     var options = {
       body: JSON.stringify({
         connection_string: server,
@@ -70,9 +72,10 @@ class App extends Component {
 
   render() {
     console.log("App rendering with: "); console.log(this.state);
-
+    var spinner = this.state.resultsLoading ? <div class="loader loading"></div> : <div class="loader"></div>;
     return (
       <div className="App container-fluid">
+        {spinner}
         <Entry
            fetchServerTemplatesForEnv={this.fetchServerTemplatesForEnv}
            fetchQueryTemplatesForEnv={this.fetchQueryTemplatesForEnv}
